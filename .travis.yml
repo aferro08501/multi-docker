@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t anthonyferro/react-test -f ./client/Dockerfile.dev ./client # build context - look into client to get build context
+
+# override startup cmd
+script:
+- docker run -e CI=true USERNAME/react-test npm test
+
+after_success:
+  - docker build -t anthonyferro/multi-client ./client #dont need dockerfile because it uses default in dir
+  - docker build -t anthonyferro/multi-nginx ./nginx
+  - docker build -t anthonyferro/multi-server ./server
+  - docker build -t anthonyferro/multi-worker ./worker\# need to be logged into docker cli
+  # need to be logged into docker cli
+  - echo "$DOCKER_PASSWORD | docker login -u "$DOCKER_ID" --password-stdin
+  # ^ logs into docker in 1 command
+  # env vars in travis
+  # take those images and push to dockerhub
+  - docker push anthonyferro/multi-client
+  - docker push anthonyferro/multi-nginx
+  - docker push anthonyferro/multi-server
+  - docker push anthonyferro/multi-worker
+
