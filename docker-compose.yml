@@ -1,0 +1,49 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest' #from dockerhub (v10 has 'latest' tag)
+    # d-hub has info for postres startup and env vars
+  redis:
+    image: 'redis:latest' #also latest from d-hub, also has startup CMDs / options 
+  api:
+    build:
+      dockerfile: Dockerfile.dev #dockerfile, not specifying folder/dir
+      context: ./server # where to look for this dockerfile (build context) "use code from /server"
+    #specify using all files/folder from server when building
+    volumes:
+      - /app/node_modules # dont try to override or redirect access
+      - ./server:/app # when app tries access anything besides node_modules, automatically refrect in app folder of container
+      # ^ so we dont have to rebuild the images
+    environment:  # sets up env vars from keys.js 
+      - REDIS_HOST=redis # name service created for hosting redis service,  - specifies array
+      - REDIS_PORT=6379 #from dockerhub docs > default port for starting
+      - PGUSER=postgres # more research for the rest of these on dockerhub, PG default values
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    build:
+        dockerfile: Dockerfile.dev
+        context: ./client # all src code for client service
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    environment: 
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+  nginx:
+    restart: always #always want this running, it routes traffic to entire app
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80' #3050 on local to 80 in container
+      
