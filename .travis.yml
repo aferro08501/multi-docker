@@ -13,7 +13,7 @@ after_success:
   - docker build -t anthonyferro/multi-client ./client #dont need dockerfile because it uses default in dir
   - docker build -t anthonyferro/multi-nginx ./nginx
   - docker build -t anthonyferro/multi-server ./server
-  - docker build -t anthonyferro/multi-worker ./worker\# need to be logged into docker cli
+  - docker build -t anthonyferro/multi-worker ./worker # need to be logged into docker cli
   # need to be logged into docker cli
   - echo "$DOCKER_PASSWORD | docker login -u "$DOCKER_ID" --password-stdin
   # ^ logs into docker in 1 command
