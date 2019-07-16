@@ -24,3 +24,17 @@ after_success:
   - docker push anthonyferro/multi-server
   - docker push anthonyferro/multi-worker
 
+# deploy script
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-1
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-us-east-1-789392775764
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  # secure: $AWS_ACCESS_KEY in case it fucks up
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
